@@ -1,0 +1,98 @@
+{
+  "entities": {
+    "UserProfile": {
+      "title": "UserProfile",
+      "description": "Information regarding a user profile details, role, and credentials",
+      "type": "object",
+      "properties": {
+        "uid": { "type": "string" },
+        "name": { "type": "string" },
+        "role": { "type": "string" },
+        "age": { "type": "integer" },
+        "gender": { "type": "string" },
+        "chronicConditions": { "type": "string" },
+        "accessPin": { "type": "string" },
+        "telemetryConsent": { "type": "boolean" },
+        "licenseNumber": { "type": "string" },
+        "specialty": { "type": "string" },
+        "institution": { "type": "string" },
+        "registrationId": { "type": "string" },
+        "shift": { "type": "string" },
+        "ward": { "type": "string" },
+        "storeName": { "type": "string" },
+        "pharmacyCode": { "type": "string" },
+        "address": { "type": "string" },
+        "medicinesList": { "type": "string" },
+        "labName": { "type": "string" },
+        "accreditationId": { "type": "string" },
+        "labAddress": { "type": "string" },
+        "supportedTests": { "type": "string" },
+        "securitySignature": { "type": "string" },
+        "updatedAt": { "type": "string" }
+      },
+      "required": ["uid", "name", "role"]
+    },
+    "AssessmentReport": {
+      "title": "AssessmentReport",
+      "description": "A calculated daily digital triage and risk assessment report",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "userId": { "type": "string" },
+        "timestamp": { "type": "string" },
+        "riskScore": { "type": "integer" },
+        "riskLevel": { "type": "string" },
+        "dailySummary": { "type": "string" },
+        "createdAt": { "type": "string" }
+      },
+      "required": ["id", "userId", "riskScore", "riskLevel"]
+    },
+    "Prescription": {
+      "title": "Prescription",
+      "description": "Digital clinical prescriptions authored by physicians",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "doctor": { "type": "string" },
+        "notes": { "type": "string" },
+        "prescription": { "type": "string" },
+        "timestamp": { "type": "string" },
+        "userId": { "type": "string" }
+      },
+      "required": ["id", "doctor", "prescription"]
+    },
+    "LabResult": {
+      "title": "LabResult",
+      "description": "Pathology results published by accredited laboratories",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "labName": { "type": "string" },
+        "testType": { "type": "string" },
+        "status": { "type": "string" },
+        "results": { "type": "string" },
+        "timestamp": { "type": "string" },
+        "userId": { "type": "string" }
+      },
+      "required": ["id", "labName", "testType", "status"]
+    }
+  },
+  "firestore": {
+    "/users/{userId}": {
+      "schema": "UserProfile",
+      "description": "Secure user profile credentials"
+    },
+    "/users/{userId}/reports/{reportId}": {
+      "schema": "AssessmentReport",
+      "description": "Triage and wellness reports of the patient"
+    },
+    "/users/{userId}/prescriptions/{prescriptionId}": {
+      "schema": "Prescription",
+      "description": "Physician authored prescription forms"
+    },
+    "/users/{userId}/labs/{labId}": {
+      "schema": "LabResult",
+      "description": "Pathology laboratory result structures"
+    }
+  }
+}

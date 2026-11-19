@@ -1,0 +1,76 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    // Global Safety Net
+    match /{document=**} {
+      allow read, write: if false;
+    }
+    
+    // Core Helpers
+    function isSignedIn() {
+      return request.auth != null;
+    }
+    
+    function isOwner(userId) {
+      return isSignedIn() && request.auth.uid == userId;
+    }
+    
+    function isValidId(id) {
+      return id is string && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$');
+    }
+    
+    // Entity validations
+    function isValidUserProfile(user) {
+      return user.keys().hasAll(['uid', 'name', 'role']) 
+        && user.uid == request.auth.uid
+        && user.name is string && user.name.size() > 0 && user.name.size() <= 200
+        && user.role is string && user.role.size() > 0 && user.role.size() <= 100;
+    }
+
+    function isValidAssessmentReport(report) {
+      return report.keys().hasAll(['id', 'userId', 'riskScore', 'riskLevel'])
+        && report.userId == request.auth.uid
+        && report.id is string && report.id.size() <= 128
+        && report.riskScore is int
+        && report.riskLevel is string && report.riskLevel.size() <= 50;
+    }
+
+    function isValidPrescription(rx) {
+      return rx.keys().hasAll(['id', 'doctor', 'prescription'])
+        && rx.id is string && rx.id.size() <= 128
+        && rx.doctor is string && rx.doctor.size() <= 200
+        && rx.prescription is string && rx.prescription.size() <= 2000;
+    }
+
+    function isValidLabResult(lab) {
+      return lab.keys().hasAll(['id', 'labName', 'testType', 'status'])
+        && lab.id is string && lab.id.size() <= 128
+        && lab.labName is string && lab.labName.size() <= 200
+        && lab.testType is string && lab.testType.size() <= 100
+        && lab.status is string && lab.status.size() <= 50;
+    }
+    
+    // Path Declarations
+    match /users/{userId} {
+      allow read: if isOwner(userId);
+      allow create, update: if isOwner(userId) && isValidUserProfile(request.resource.data);
+      allow delete: if isOwner(userId);
+      
+      match /reports/{reportId} {
+        allow read, write: if isOwner(userId);
+        allow create, update: if isOwner(userId) && isValidId(reportId) && isValidAssessmentReport(request.resource.data);
+      }
+      
+      match /prescriptions/{prescriptionId} {
+        allow read: if isSignedIn();
+        allow create, update: if isSignedIn() && isValidId(prescriptionId) && isValidPrescription(request.resource.data);
+      }
+      
+      match /labs/{labId} {
+        allow read: if isSignedIn();
+        allow create, update: if isSignedIn() && isValidId(labId) && isValidLabResult(request.resource.data);
+      }
+    }
+  }
+}

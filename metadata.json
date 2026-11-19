@@ -1,0 +1,6 @@
+{
+  "name": "Eunice",
+  "description": "Access to Healthcare and Wellness - tools to live healthier.",
+  "requestFramePermissions": ["camera", "microphone"],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
